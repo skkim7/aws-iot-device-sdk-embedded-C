@@ -72,6 +72,7 @@ IoT_Error_t aws_iot_shadow_init(AWS_IoT_Client *pClient, const ShadowInitParamet
 	mqttInitParams.pRootCALocation = pParams->pRootCA;
 	mqttInitParams.pDeviceCertLocation = pParams->pClientCRT;
 	mqttInitParams.pDevicePrivateKeyLocation = pParams->pClientKey;
+	mqttInitParams.mqttPacketTimeout_ms = 5000;
 	mqttInitParams.mqttCommandTimeout_ms = 20000;
 	mqttInitParams.tlsHandshakeTimeout_ms = 5000;
 	mqttInitParams.isSSLHostnameVerify = true;
@@ -103,7 +104,7 @@ IoT_Error_t aws_iot_shadow_connect(AWS_IoT_Client *pClient, const ShadowConnectP
 	snprintf(myThingName, MAX_SIZE_OF_THING_NAME, "%s", pParams->pMyThingName);
 	snprintf(mqttClientID, MAX_SIZE_OF_UNIQUE_CLIENT_ID_BYTES, "%s", pParams->pMqttClientId);
 
-	ConnectParams.keepAliveIntervalInSec = 10;
+	ConnectParams.keepAliveIntervalInSec = 600; // NOTE: Temporary fix
 	ConnectParams.MQTTVersion = MQTT_3_1_1;
 	ConnectParams.isCleanSession = true;
 	ConnectParams.isWillMsgPresent = false;

@@ -188,7 +188,7 @@ static void AckStatusCallback(AWS_IoT_Client *pClient, char *topicName, uint16_t
 	IOT_UNUSED(topicNameLen);
 	IOT_UNUSED(pData);
 
-	if(params->payloadLen > SHADOW_MAX_SIZE_OF_RX_BUFFER) {
+	if(params->payloadLen >= SHADOW_MAX_SIZE_OF_RX_BUFFER) {
 		IOT_WARN("Payload larger than RX Buffer");
 		return;
 	}
@@ -219,17 +219,16 @@ static void AckStatusCallback(AWS_IoT_Client *pClient, char *topicName, uint16_t
 						status = SHADOW_ACK_ACCEPTED;
 					} else if(strstr(topicName, "rejected") != NULL) {
 						status = SHADOW_ACK_REJECTED;
-					} else {
-						continue;
 					}
-					/* status == SHADOW_ACK_ACCEPTED || status == SHADOW_ACK_REJECTED */
-					if(AckWaitList[i].callback != NULL) {
-						AckWaitList[i].callback(AckWaitList[i].thingName, AckWaitList[i].action, status,
-												shadowRxBuf, AckWaitList[i].pCallbackContext);
+					if(status == SHADOW_ACK_ACCEPTED || status == SHADOW_ACK_REJECTED) {
+						if(AckWaitList[i].callback != NULL) {
+							AckWaitList[i].callback(AckWaitList[i].thingName, AckWaitList[i].action, status,
+													shadowRxBuf, AckWaitList[i].pCallbackContext);
+						}
+						unsubscribeFromAcceptedAndRejected(i);
+						AckWaitList[i].isFree = true;
+						return;
 					}
-					unsubscribeFromAcceptedAndRejected(i);
-					AckWaitList[i].isFree = true;
-					return;
 				}
 			}
 		}
@@ -413,6 +412,7 @@ IoT_Error_t publishToShadowAction(const char *pThingName, ShadowActions_t action
 	topicNameFromThingAndAction(TemporaryTopicName, pThingName, action, SHADOW_ACTION);
 
 	msgParams.qos = QOS0;
+	msgParams.isRetained = 0;
 	msgParams.payloadLen = strlen(pJsonDocumentToBeSent);
 	msgParams.payload = (char *) pJsonDocumentToBeSent;
 	ret_val = aws_iot_mqtt_publish(pMqttClient, TemporaryTopicName, (uint16_t) strlen(TemporaryTopicName), &msgParams);
@@ -484,7 +484,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 	IOT_UNUSED(topicNameLen);
 	IOT_UNUSED(pData);
 
-	if(params->payloadLen > SHADOW_MAX_SIZE_OF_RX_BUFFER) {
+	if(params->payloadLen >= SHADOW_MAX_SIZE_OF_RX_BUFFER) {
 		IOT_WARN("Payload larger than RX Buffer");
 		return;
 	}

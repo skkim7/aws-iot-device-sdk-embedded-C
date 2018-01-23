@@ -39,6 +39,8 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
 #include <aws_iot_mqtt_client.h>
 #include "aws_iot_mqtt_client_interface.h"
 #include "aws_iot_mqtt_client_common_internal.h"
@@ -456,7 +458,6 @@ static IoT_Error_t _aws_iot_mqtt_internal_connect(AWS_IoT_Client *pClient, const
 IoT_Error_t aws_iot_mqtt_connect(AWS_IoT_Client *pClient, const IoT_Client_Connect_Params *pConnectParams) {
 	IoT_Error_t rc, disconRc;
 	ClientState clientState;
-
 	FUNC_ENTRY;
 
 	if(NULL == pClient) {
