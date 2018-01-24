@@ -45,6 +45,7 @@ void FillWithClientToken(char *pStringToUpdateClientToken);
 bool extractClientToken(const char *pJsonDocumentToBeSent, char *pExtractedClientToken);
 
 bool extractVersionNumber(const char *pJsonDocument, void *pJsonHandler, int32_t tokenCount, uint32_t *pVersionNumber);
+bool extractTimeStampNumber(const char *pJsonDocument, void *pJsonHandler, int32_t tokenCount, uint32_t *pTime) ;
 
 #ifdef __cplusplus
 }

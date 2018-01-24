@@ -18,5 +18,6 @@
 
 #define SHADOW_CLIENT_TOKEN_STRING "clientToken"
 #define SHADOW_VERSION_STRING "version"
+#define SHADOW_TIMESTAMP_STRING "timestamp"
 
 #endif /* SRC_SHADOW_AWS_IOT_SHADOW_KEY_H_ */

@@ -80,6 +80,7 @@ static JsonTokenTable_t tokenTable[MAX_JSON_TOKEN_EXPECTED];
 static uint32_t tokenTableIndex = 0;
 static bool deltaTopicSubscribedFlag = false;
 uint32_t shadowJsonVersionNum = 0;
+uint32_t shadowJsonTimestamp = 0;
 bool shadowDiscardOldDeltaFlag = true;
 
 // local helper functions
@@ -203,10 +204,16 @@ static void AckStatusCallback(AWS_IoT_Client *pClient, char *topicName, uint16_t
 
 	if(isValidShadowVersionUpdate(topicName)) {
 		uint32_t tempVersionNumber = 0;
+		uint32_t tempTimestamp = 0;
 		if(extractVersionNumber(shadowRxBuf, pJsonHandler, tokenCount, &tempVersionNumber)) {
 			if(tempVersionNumber > shadowJsonVersionNum) {
 				shadowJsonVersionNum = tempVersionNumber;
 			}
+		}
+
+		if(extractTimeStampNumber(shadowRxBuf, pJsonHandler, tokenCount, &tempTimestamp)) {
+//			ESP_LOGI("parse","ACK Message received timestamp rx: %d local: %d",tempTimestamp,shadowJsonTimestamp);
+			shadowJsonTimestamp = tempTimestamp;
 		}
 	}
 
@@ -476,6 +483,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 	int32_t DataPosition;
 	uint32_t dataLength;
 	uint32_t tempVersionNumber = 0;
+	uint32_t temptimestamp = 0;
 
 	FUNC_ENTRY;
 
@@ -506,6 +514,11 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 						 shadowJsonVersionNum);
 				return;
 			}
+		}
+
+		if(extractTimeStampNumber(shadowRxBuf, pJsonHandler, tokenCount, &temptimestamp)) {
+//			ESP_LOGI("parse","Delta Message received timestamp rx: %d local: %d", temptimestamp,shadowJsonTimestamp);
+			shadowJsonTimestamp = temptimestamp;
 		}
 	}
 

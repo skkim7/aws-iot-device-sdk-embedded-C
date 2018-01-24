@@ -473,6 +473,23 @@ bool extractVersionNumber(const char *pJsonDocument, void *pJsonHandler, int32_t
 	return false;
 }
 
+bool extractTimeStampNumber(const char *pJsonDocument, void *pJsonHandler, int32_t tokenCount, uint32_t *pTime) {
+	int32_t i;
+	IoT_Error_t ret_val = SUCCESS;
+
+	IOT_UNUSED(pJsonHandler);
+
+	for(i = 1; i < tokenCount; i++) {
+		if(jsoneq(pJsonDocument, &(jsonTokenStruct[i]), SHADOW_TIMESTAMP_STRING) == 0) {
+			ret_val = parseUnsignedInteger32Value(pTime, pJsonDocument, &jsonTokenStruct[i + 1]);
+			if(ret_val == SUCCESS) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -32,6 +32,10 @@ extern "C" {
 #include "aws_iot_shadow_key.h"
 #include "aws_iot_shadow_records.h"
 
+#ifndef MQTT_ALIVE_INTERVALS
+#define MQTT_ALIVE_INTERVALS			(15*60)
+#endif
+
 const ShadowInitParameters_t ShadowInitParametersDefault = {(char *) AWS_IOT_MQTT_HOST, AWS_IOT_MQTT_PORT, NULL, NULL,
 															NULL, false, NULL};
 
@@ -46,6 +50,10 @@ void aws_iot_shadow_reset_last_received_version(void) {
 
 uint32_t aws_iot_shadow_get_last_received_version(void) {
 	return shadowJsonVersionNum;
+}
+
+uint32_t aws_iot_shadow_get_last_received_timestamp(void) {
+	return shadowJsonTimestamp;
 }
 
 void aws_iot_shadow_enable_discard_old_delta_msgs(void) {
@@ -104,7 +112,7 @@ IoT_Error_t aws_iot_shadow_connect(AWS_IoT_Client *pClient, const ShadowConnectP
 	snprintf(myThingName, MAX_SIZE_OF_THING_NAME, "%s", pParams->pMyThingName);
 	snprintf(mqttClientID, MAX_SIZE_OF_UNIQUE_CLIENT_ID_BYTES, "%s", pParams->pMqttClientId);
 
-	ConnectParams.keepAliveIntervalInSec = 600; // NOTE: Temporary fix
+	ConnectParams.keepAliveIntervalInSec = MQTT_ALIVE_INTERVALS;
 	ConnectParams.MQTTVersion = MQTT_3_1_1;
 	ConnectParams.isCleanSession = true;
 	ConnectParams.isWillMsgPresent = false;

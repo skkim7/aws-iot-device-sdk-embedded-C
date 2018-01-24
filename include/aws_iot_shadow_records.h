@@ -27,6 +27,8 @@ extern "C" {
 
 
 extern uint32_t shadowJsonVersionNum;
+extern uint32_t shadowJsonTimestamp;
+
 extern bool shadowDiscardOldDeltaFlag;
 
 extern char myThingName[MAX_SIZE_OF_THING_NAME];
